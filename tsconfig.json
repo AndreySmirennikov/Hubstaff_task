@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "commonjs",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "outDir": "./dist",
+    "rootDir": ".",
+    "resolveJsonModule": true,
+    "sourceMap": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["*"]
+    },
+    "lib": ["esnext", "dom"]
+  },
+  "include": [
+    "**/*.ts",
+    "**/*.tsx"
+, "tests/specs/signup.spec.js"  ],
+  "exclude": [
+    "node_modules"
+  ]
+} 

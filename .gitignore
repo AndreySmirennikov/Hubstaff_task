@@ -1,0 +1,5 @@
+.history/
+playwright-report
+test-results
+allure-results
+node_modules
