@@ -11,7 +11,7 @@ export class MarketingPage extends BasePage {
         super(page);
         this.freeTrialButton = Button.fromLocator(this.page.locator('a[href*=signup][data-name="Free 14-day trial"]').first(), 'Free 14-day trial Button');
         this.mainHeading = Text.fromLocator(this.page.getByRole('heading', { name: 'Time tracking software for' }), 'Main Heading');
-        this.signInButton = Link.fromLocator(this.page.getByRole('link', { name: 'Sign in' }), 'Sign in Button');
+        this.signInButton = Link.fromLocator(this.page.locator('[data-testid="sign_in_button"]'), 'Sign in Button');
     }
 
     async clickFreeTrialButton() {
