@@ -26,7 +26,7 @@ jobs:
 
   nightly-report:
     needs: nightly-test
-    if: always()
+    if: ${{ always() && needs.nightly-test.result != 'skipped' }}
     uses: ./.github/workflows/generate-report.yml
     with:
       download_path: nightly-test-results

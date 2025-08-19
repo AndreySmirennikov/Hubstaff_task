@@ -25,7 +25,7 @@ jobs:
 
   pr-report:
     needs: test-pr
-    if: always()
+    if: ${{ always() && needs.test-pr.result != 'skipped' }}
     uses: ./.github/workflows/generate-report.yml
     with:
       download_path: pr-test-results
