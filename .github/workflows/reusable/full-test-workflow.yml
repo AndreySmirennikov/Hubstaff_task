@@ -1,0 +1,43 @@
+name: Full Test Workflow
+
+on:
+  workflow_call:
+    inputs:
+      browsers:
+        required: true
+        type: string # Changed to string for simpler input
+      shards:
+        required: true
+        type: number
+      retention_days:
+        required: true
+        type: number
+
+jobs:
+  lint-format:
+    uses: ./.github/workflows/reusable/lint-format.yml
+
+  test:
+    needs: lint-format
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: ${{ fromJson(inputs.browsers) }}
+        shard: ${{ range(1, inputs.shards + 1) }}
+    uses: ./.github/workflows/reusable/test-run.yml
+    with:
+      browser: ${{ matrix.browser }}
+      shard_index: ${{ matrix.shard }}
+      shard_total: ${{ inputs.shards }}
+      artifact_name: test-results-${{ matrix.browser }}-${{ matrix.shard }}
+      retention_days: ${{ inputs.retention_days }}
+
+  generate-report:
+    needs: test
+    if: ${{ always() && needs.test.result != 'skipped' }}
+    uses: ./.github/workflows/reusable/generate-report.yml
+    with:
+      download_path: test-results # Simplified path
+      allure_artifact_name: allure-report
+      html_artifact_name: html-report
+      retention_days: ${{ inputs.retention_days }}
