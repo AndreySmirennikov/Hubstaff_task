@@ -36,32 +36,50 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Install Allure CLI
+        run: |
+          apt-get update
+          apt-get install -y openjdk-17-jre-headless unzip
+          curl -o allure.zip -Ls https://github.com/allure-framework/allure2/releases/download/2.30.0/allure-2.30.0.zip
+          unzip allure.zip -d /opt/allure
+          rm allure.zip
+          echo "/opt/allure/bin" >> $GITHUB_PATH
+
       - name: Download test results
         uses: actions/download-artifact@v4
         with:
           path: ${{ inputs.download_path }}
 
+      - name: Check if results exist
+        id: check-results
+        run: |
+          if [ -n "$(find ${{ inputs.download_path }} -type f)" ]; then
+            echo "has_results=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_results=false" >> $GITHUB_OUTPUT
+          fi
+
       - name: Merge test results
+        if: steps.check-results.outputs.has_results == 'true'
         run: |
           mkdir -p ${{ inputs.merged_dir }}
           find ${{ inputs.download_path }} -name "test-results" -type d -exec cp -r {}/. ${{ inputs.merged_dir }}/ \;
           find ${{ inputs.download_path }} -name "allure-results" -type d -exec cp -r {}/. ${{ inputs.merged_dir }}/ \;
 
       - name: Generate Allure Report
-        run: npm run allure:generate
+        if: steps.check-results.outputs.has_results == 'true'
+        run: allure generate ${{ inputs.merged_dir }}/allure-results --clean
 
       - name: Upload Allure Report
+        if: steps.check-results.outputs.has_results == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: ${{ inputs.allure_artifact_name }}
           path: allure-report/
           retention-days: ${{ inputs.retention_days }}
 
-      # Remove HTML generation since it's already in test artifacts
-      # - name: Generate HTML Report
-      #   run: npm run report:generate
-
       - name: Upload HTML Report
+        if: steps.check-results.outputs.has_results == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: ${{ inputs.html_artifact_name }}
