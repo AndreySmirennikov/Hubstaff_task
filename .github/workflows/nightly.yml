@@ -7,7 +7,7 @@ on:
 
 jobs:
   full-test:
-    uses: ./.github/workflows/reusable/full-test-workflow.yml
+    uses: ./.github/workflows/full-test-workflow.yml
     with:
       browsers: '["chromium", "webkit"]'
       shards: 6

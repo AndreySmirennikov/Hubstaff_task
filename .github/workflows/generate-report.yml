@@ -3,15 +3,6 @@ name: Generate Report
 on:
   workflow_call:
     inputs:
-      download_path:
-        required: true
-        type: string
-      allure_artifact_name:
-        required: true
-        type: string
-      html_artifact_name:
-        required: true
-        type: string
       retention_days:
         required: true
         type: number
@@ -38,19 +29,19 @@ jobs:
           rm allure.zip
           echo "/opt/allure/bin" >> $GITHUB_PATH
 
-      - name: Download test results
+      - name: Download all test artifacts
         uses: actions/download-artifact@v4
         with:
-          path: ${{ inputs.download_path }}
+          path: artifacts
 
       - name: Prepare result directories
         run: mkdir -p allure-results playwright-report
 
-      - name: Merge test results
-        run: find ${{ inputs.download_path }} -type d -name "allure-results" -exec cp -r {}/. allure-results/ \; || echo "No allure-results found"
+      - name: Merge Allure results
+        run: find artifacts -type d -name "allure-results" -exec cp -r {}/. allure-results/ \; || echo "No allure-results found"
 
       - name: Merge Playwright reports
-        run: find ${{ inputs.download_path }} -type d -name "playwright-report" -exec cp -r {}/. playwright-report/ \; || echo "No playwright-report found"
+        run: find artifacts -type d -name "playwright-report" -exec cp -r {}/. playwright-report/ \; || echo "No playwright-report found"
 
       - name: Generate Allure Report
         run: allure generate allure-results --clean -o allure-report
@@ -58,13 +49,13 @@ jobs:
       - name: Upload Allure Report
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ inputs.allure_artifact_name }}
-          path: allure-report/
+          name: allure-report
+          path: allure-report
           retention-days: ${{ inputs.retention_days }}
 
       - name: Upload HTML Report
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ inputs.html_artifact_name }}
-          path: playwright-report/
+          name: html-report
+          path: playwright-report
           retention-days: ${{ inputs.retention_days }}

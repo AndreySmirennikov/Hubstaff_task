@@ -4,13 +4,9 @@ on:
   push:
     branches: [main, develop]
 
-env:
-  NODE_VERSION: '18'
-  PLAYWRIGHT_BROWSERS_PATH: '0'
-
 jobs:
   full-test:
-    uses: ./.github/workflows/reusable/full-test-workflow.yml
+    uses: ./.github/workflows/full-test-workflow.yml
     with:
       browsers: '["chromium", "webkit"]'
       shards: 4
