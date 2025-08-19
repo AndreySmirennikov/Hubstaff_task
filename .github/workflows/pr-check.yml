@@ -1,0 +1,35 @@
+name: PR Check
+
+on:
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  lint-format:
+    uses: ./.github/workflows/lint-format.yml
+
+  test-pr:
+    needs: lint-format
+    strategy:
+      matrix:
+        browser: [chromium]
+        shardIndex: [1, 2]
+        shardTotal: [2]
+    uses: ./.github/workflows/test-run.yml
+    with:
+      browser: ${{ matrix.browser }}
+      shard_index: ${{ matrix.shardIndex }}
+      shard_total: ${{ matrix.shardTotal }}
+      artifact_name: pr-test-results-${{ matrix.browser }}-${{ matrix.shardIndex }}
+      retention_days: 7
+
+  pr-report:
+    needs: test-pr
+    if: always()
+    uses: ./.github/workflows/generate-report.yml
+    with:
+      download_path: pr-test-results
+      merged_dir: merged-results
+      allure_artifact_name: pr-allure-report
+      html_artifact_name: pr-html-report
+      retention_days: 7

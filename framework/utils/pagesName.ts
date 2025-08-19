@@ -1,5 +1,5 @@
 export enum PagesName {
-    MARKETING = '/',
-    PROJECTS = 'projects',
-    TEAM_PAYMENTS = 'team_payments',
-} 
+  MARKETING = '/',
+  PROJECTS = 'projects',
+  TEAM_PAYMENTS = 'team_payments',
+}

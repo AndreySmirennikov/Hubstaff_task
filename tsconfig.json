@@ -16,11 +16,6 @@
     },
     "lib": ["esnext", "dom"]
   },
-  "include": [
-    "**/*.ts",
-    "**/*.tsx"
-, "tests/specs/signup.spec.js"  ],
-  "exclude": [
-    "node_modules"
-  ]
-} 
+  "include": ["**/*.ts", "**/*.tsx", "tests/specs/signup.spec.js"],
+  "exclude": ["node_modules"]
+}

@@ -7,7 +7,10 @@ export abstract class BasePage {
 
   constructor(page: Page) {
     this.page = page;
-    this.acceptCookieButton = Button.fromLocator(this.page.getByRole('button', { name: 'OK' }), 'Accept Cookie Button');
+    this.acceptCookieButton = Button.fromLocator(
+      this.page.getByRole('button', { name: 'OK' }),
+      'Accept Cookie Button'
+    );
   }
 
   async extractOrgIdAfterSignIn(): Promise<string> {

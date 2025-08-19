@@ -19,15 +19,34 @@ export class TeamPaymentsPage extends BasePage {
   constructor(page: Page) {
     super(page);
     this.oneTimeAmountTab = new Link(this.page, 'a[href*="bonus"]', 'One-time amount tab');
-    this.membersDropdown = new DropDown(this.page, "select[name*='team_payment[member_ids]']", 'Members dropdown');
+    this.membersDropdown = new DropDown(
+      this.page,
+      "select[name*='team_payment[member_ids]']",
+      'Members dropdown'
+    );
     this.memberNames = new Text(this.page, 'span[class=selection] li[title]', 'Member names');
     this.amountInput = new Input(this.page, '[id=team_payment_total_amount]', 'Amount per member');
     this.noteInput = new Input(this.page, '[id=team_payment_note]', 'Note');
     this.createPaymentButton = new Button(this.page, 'a[class*=bonus-payment]', 'Create payment');
-    this.createPaymentInModal = new Button(this.page, 'input[type="submit"][name]', 'Create payment in modal');
-    this.notNowButton = Button.fromLocator(this.page.locator('//button[contains(text(), "Not now")]').first(), 'Not now');
-    this.paymentSummaryModal = new Text(this.page, '[id="#payment-wizard-modal-form"]', 'Payment Summary Modal');
-    this.markedAsPaidNotice = new Text(this.page, 'div.notice:has-text("Marked as paid")', 'Marked as Paid Notice');
+    this.createPaymentInModal = new Button(
+      this.page,
+      'input[type="submit"][name]',
+      'Create payment in modal'
+    );
+    this.notNowButton = Button.fromLocator(
+      this.page.locator('//button[contains(text(), "Not now")]').first(),
+      'Not now'
+    );
+    this.paymentSummaryModal = new Text(
+      this.page,
+      '[id="#payment-wizard-modal-form"]',
+      'Payment Summary Modal'
+    );
+    this.markedAsPaidNotice = new Text(
+      this.page,
+      'div.notice:has-text("Marked as paid")',
+      'Marked as Paid Notice'
+    );
     this.exportTabModal = new Button(this.page, 'li[class*=export]', 'Export tab at Modal');
     this.sendTabModal = new Button(this.page, 'li[class*=send]', 'Send tab at Modal');
   }
@@ -94,7 +113,9 @@ export class TeamPaymentsPage extends BasePage {
       await this.paymentSummaryModal.shouldBeVisible();
       await this.paymentSummaryModal.shouldContainText(amount);
       await this.paymentSummaryModal.shouldContainText(org);
-      await this.paymentSummaryModal.shouldContainText("After you create the payment, you can find it in the 'Past payments' menu. From there, you have the option to export or send the payment in the next step.");
+      await this.paymentSummaryModal.shouldContainText(
+        "After you create the payment, you can find it in the 'Past payments' menu. From there, you have the option to export or send the payment in the next step."
+      );
     });
   }
 
@@ -105,7 +126,13 @@ export class TeamPaymentsPage extends BasePage {
     });
   }
 
-  async verifyPaymentSummary(member: string, rateType: string, hours: string, status: string, amount: string) {
+  async verifyPaymentSummary(
+    member: string,
+    rateType: string,
+    hours: string,
+    status: string,
+    amount: string
+  ) {
     await test.step(`Verify Payment Summary for: ${member}`, async () => {
       const row = this.page.locator(`//tr[td[text()="${member}"]]`);
       await expect(row.locator('td').nth(0)).toHaveText(member);

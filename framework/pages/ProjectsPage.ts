@@ -12,9 +12,17 @@ export class ProjectsPage extends BasePage {
   constructor(page: Page) {
     super(page);
     this.addProjectButton = new Button(page, 'text=Add project', 'Add project Button');
-    this.projectNameInput = new Input(page, 'textarea[placeholder="Add project names separated by new lines"]', 'Project Name Input');
+    this.projectNameInput = new Input(
+      page,
+      'textarea[placeholder="Add project names separated by new lines"]',
+      'Project Name Input'
+    );
     this.saveButton = new Button(page, 'button:has-text("Save")', 'Save Button');
-    this.notification = new Text(page, 'div[class*="notification"] div[class*="message"]', 'Notification Message');
+    this.notification = new Text(
+      page,
+      'div[class*="notification"] div[class*="message"]',
+      'Notification Message'
+    );
     this.title = new Text(page, 'h2[class="page-heading"]', 'Tittle "Projects"');
   }
 

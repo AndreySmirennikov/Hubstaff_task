@@ -17,7 +17,7 @@ export class BaseElement {
     this: new (page: Page, locator: string, name: string) => T,
     page: Page,
     selector: string,
-    name: string,
+    name: string
   ): T {
     return new this(page, selector, name);
   }
@@ -25,7 +25,7 @@ export class BaseElement {
   static fromLocator<T extends BaseElement>(
     this: new (page: Page, locator: string, name: string) => T,
     locator: Locator,
-    name: string,
+    name: string
   ): T {
     const inst = new this(locator.page(), '', name);
     inst.el = locator;
@@ -55,10 +55,7 @@ export class BaseElement {
   }
 
   protected step<T>(action: string, fn: () => Promise<T>): Promise<T> {
-    return test.step(
-      `${this.typeOf} with name "${this.webElementName}" ${action}`,
-      fn,
-    );
+    return test.step(`${this.typeOf} with name "${this.webElementName}" ${action}`, fn);
   }
 
   async click(options?: Parameters<Locator['click']>[0]) {
@@ -87,12 +84,10 @@ export class BaseElement {
 
   async selectOption(
     values: Parameters<Locator['selectOption']>[0],
-    options?: Parameters<Locator['selectOption']>[1],
+    options?: Parameters<Locator['selectOption']>[1]
   ) {
     const vals = JSON.stringify(values);
-    return this.step(`selectOption(${vals})`, () =>
-      this.el.selectOption(values, options),
-    );
+    return this.step(`selectOption(${vals})`, () => this.el.selectOption(values, options));
   }
 
   async shouldBeAttached(options?: {
@@ -100,9 +95,7 @@ export class BaseElement {
 
     timeout?: number;
   }): Promise<void> {
-    return this.step('should be attached', () =>
-      expect(this.el).toBeAttached(options),
-    );
+    return this.step('should be attached', () => expect(this.el).toBeAttached(options));
   }
 
   async shouldBeChecked(options?: {
@@ -110,72 +103,39 @@ export class BaseElement {
     indeterminate?: boolean;
     timeout?: number;
   }): Promise<void> {
-    return this.step('should be checked', () =>
-      expect(this.el).toBeChecked(options),
-    );
+    return this.step('should be checked', () => expect(this.el).toBeChecked(options));
   }
 
-  async shouldBeDisabled(options?: {
-    disabled?: boolean;
-    timeout?: number;
-  }): Promise<void> {
-    return this.step('should be disabled', () =>
-      expect(this.el).toBeDisabled(options),
-    );
+  async shouldBeDisabled(options?: { disabled?: boolean; timeout?: number }): Promise<void> {
+    return this.step('should be disabled', () => expect(this.el).toBeDisabled(options));
   }
 
-  async shouldBeEditable(options?: {
-    editable?: boolean;
-    timeout?: number;
-  }): Promise<void> {
-    return this.step('should be editable', () =>
-      expect(this.el).toBeEditable(options),
-    );
+  async shouldBeEditable(options?: { editable?: boolean; timeout?: number }): Promise<void> {
+    return this.step('should be editable', () => expect(this.el).toBeEditable(options));
   }
 
   async shouldBeEmpty(options?: { timeout?: number }): Promise<void> {
-    return this.step('should be empty', () =>
-      expect(this.el).toBeEmpty(options),
-    );
+    return this.step('should be empty', () => expect(this.el).toBeEmpty(options));
   }
 
-  async shouldBeEnabled(options?: {
-    enabled?: boolean;
-    timeout?: number;
-  }): Promise<void> {
-    return this.step('should be enabled', () =>
-      expect(this.el).toBeEnabled(options),
-    );
+  async shouldBeEnabled(options?: { enabled?: boolean; timeout?: number }): Promise<void> {
+    return this.step('should be enabled', () => expect(this.el).toBeEnabled(options));
   }
 
   async shouldBeFocused(options?: { timeout?: number }): Promise<void> {
-    return this.step('should be focused', () =>
-      expect(this.el).toBeFocused(options),
-    );
+    return this.step('should be focused', () => expect(this.el).toBeFocused(options));
   }
 
   async shouldBeHidden(options?: { timeout?: number }): Promise<void> {
-    return this.step('should be hidden', () =>
-      expect(this.el).toBeHidden(options),
-    );
+    return this.step('should be hidden', () => expect(this.el).toBeHidden(options));
   }
 
-  async shouldBeInViewport(options?: {
-    ratio?: number;
-    timeout?: number;
-  }): Promise<void> {
-    return this.step('should be in viewport', () =>
-      expect(this.el).toBeInViewport(options),
-    );
+  async shouldBeInViewport(options?: { ratio?: number; timeout?: number }): Promise<void> {
+    return this.step('should be in viewport', () => expect(this.el).toBeInViewport(options));
   }
 
-  async shouldBeVisible(options?: {
-    timeout?: number;
-    visible?: boolean;
-  }): Promise<void> {
-    return this.step('should be visible', () =>
-      expect(this.el).toBeVisible(options),
-    );
+  async shouldBeVisible(options?: { timeout?: number; visible?: boolean }): Promise<void> {
+    return this.step('should be visible', () => expect(this.el).toBeVisible(options));
   }
 
   async shouldHaveAccessibleDescription(
@@ -183,10 +143,10 @@ export class BaseElement {
     options?: {
       ignoreCase?: boolean;
       timeout?: number;
-    },
+    }
   ): Promise<void> {
     return this.step('should have accessible description', () =>
-      expect(this.el).toHaveAccessibleDescription(description, options),
+      expect(this.el).toHaveAccessibleDescription(description, options)
     );
   }
 
@@ -195,10 +155,10 @@ export class BaseElement {
     options?: {
       ignoreCase?: boolean;
       timeout?: number;
-    },
+    }
   ): Promise<void> {
     return this.step('should have accessible name', () =>
-      expect(this.el).toHaveAccessibleName(name, options),
+      expect(this.el).toHaveAccessibleName(name, options)
     );
   }
 
@@ -208,10 +168,10 @@ export class BaseElement {
     options?: {
       ignoreCase?: boolean;
       timeout?: number;
-    },
+    }
   ): Promise<void> {
     return this.step('should have attribute', () =>
-      expect(this.el).toHaveAttribute(name, value, options),
+      expect(this.el).toHaveAttribute(name, value, options)
     );
   }
 
@@ -219,22 +179,18 @@ export class BaseElement {
     expected: string | RegExp | ReadonlyArray<string | RegExp>,
     options?: {
       timeout?: number;
-    },
+    }
   ): Promise<void> {
-    return this.step('should have class', () =>
-      expect(this.el).toHaveClass(expected, options),
-    );
+    return this.step('should have class', () => expect(this.el).toHaveClass(expected, options));
   }
 
   async shouldHaveCount(
     count: number,
     options?: {
       timeout?: number;
-    },
+    }
   ): Promise<void> {
-    return this.step('should have count', () =>
-      expect(this.el).toHaveCount(count, options),
-    );
+    return this.step('should have count', () => expect(this.el).toHaveCount(count, options));
   }
 
   async shouldHaveCSS(
@@ -242,10 +198,10 @@ export class BaseElement {
     value: string | RegExp,
     options?: {
       timeout?: number;
-    },
+    }
   ): Promise<void> {
     return this.step(`should have CSS ${name} = ${value}`, () =>
-      expect(this.el).toHaveCSS(name, value, options),
+      expect(this.el).toHaveCSS(name, value, options)
     );
   }
 
@@ -253,11 +209,9 @@ export class BaseElement {
     id: string | RegExp,
     options?: {
       timeout?: number;
-    },
+    }
   ): Promise<void> {
-    return this.step('should have id', () =>
-      expect(this.el).toHaveId(id, options),
-    );
+    return this.step('should have id', () => expect(this.el).toHaveId(id, options));
   }
 
   async shouldHaveJSProperty(
@@ -265,10 +219,10 @@ export class BaseElement {
     value: unknown,
     options?: {
       timeout?: number;
-    },
+    }
   ): Promise<void> {
     return this.step('should have JS property', () =>
-      expect(this.el).toHaveJSProperty(name, value, options),
+      expect(this.el).toHaveJSProperty(name, value, options)
     );
   }
 
@@ -352,11 +306,9 @@ export class BaseElement {
       pressed?: boolean;
       selected?: boolean;
       timeout?: number;
-    },
+    }
   ): Promise<void> {
-    return this.step('should have role', () =>
-      expect(this.el).toHaveRole(role, options),
-    );
+    return this.step('should have role', () => expect(this.el).toHaveRole(role, options));
   }
 
   async shouldHaveScreenshot(
@@ -373,10 +325,10 @@ export class BaseElement {
       stylePath?: string | Array<string>;
       threshold?: number;
       timeout?: number;
-    },
+    }
   ): Promise<void> {
     return this.step('should have screenshot', () =>
-      expect(this.el).toHaveScreenshot(name, options),
+      expect(this.el).toHaveScreenshot(name, options)
     );
   }
 
@@ -386,10 +338,10 @@ export class BaseElement {
       ignoreCase?: boolean;
       timeout?: number;
       useInnerText?: boolean;
-    },
+    }
   ): Promise<void> {
     return this.step(`should contain text: ${expected}`, () =>
-      expect(this.el).toContainText(expected, options),
+      expect(this.el).toContainText(expected, options)
     );
   }
 
@@ -399,10 +351,10 @@ export class BaseElement {
       ignoreCase?: boolean;
       normalizeWhiteSpace?: boolean;
       timeout?: number;
-    },
+    }
   ): Promise<void> {
     return this.step(`should have text: ${expected}`, () =>
-      expect(this.el).toHaveText(expected, options),
+      expect(this.el).toHaveText(expected, options)
     );
   }
 
@@ -410,10 +362,10 @@ export class BaseElement {
     value: string | RegExp,
     options?: {
       timeout?: number;
-    },
+    }
   ): Promise<void> {
     return this.step(`should have value: ${value}`, () =>
-      expect(this.el).toHaveValue(value, options),
+      expect(this.el).toHaveValue(value, options)
     );
   }
 
@@ -421,10 +373,10 @@ export class BaseElement {
     values: ReadonlyArray<string | RegExp>,
     options?: {
       timeout?: number;
-    },
+    }
   ): Promise<void> {
     return this.step(`should have values: ${values}`, () =>
-      expect(this.el).toHaveValues(values, options),
+      expect(this.el).toHaveValues(values, options)
     );
   }
 
@@ -432,10 +384,10 @@ export class BaseElement {
     expected: string,
     options?: {
       timeout?: number;
-    },
+    }
   ): Promise<void> {
     return this.step('should match aria snapshot', () =>
-      expect(this.el).toMatchAriaSnapshot(expected, options),
+      expect(this.el).toMatchAriaSnapshot(expected, options)
     );
   }
 }
