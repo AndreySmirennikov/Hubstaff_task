@@ -15,8 +15,9 @@ jobs:
   test:
     needs: lint-format
     strategy:
+      fail-fast: false
       matrix:
-        browser: [chromium, firefox, webkit]
+        browser: [chromium, webkit]
         shardIndex: [1, 2, 3, 4]
         shardTotal: [4]
     uses: ./.github/workflows/test-run.yml

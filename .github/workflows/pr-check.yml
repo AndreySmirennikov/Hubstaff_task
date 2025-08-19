@@ -11,6 +11,7 @@ jobs:
   test-pr:
     needs: lint-format
     strategy:
+      fail-fast: false
       matrix:
         browser: [chromium]
         shardIndex: [1, 2]
