@@ -3,7 +3,7 @@ name: Dependency Update
 on:
   schedule:
     - cron: '0 3 * * 1' # Run every Monday at 3 AM UTC
-  workflow_dispatch: # Allow manual trigger
+  workflow_dispatch: 
 
 jobs:
   dependency-check:
