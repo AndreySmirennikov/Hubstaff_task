@@ -63,7 +63,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        shard: ${{ fromJson(github.event.inputs.shard_indexes || vars.SHARD_INDEXES ) }}
+        shard: ${{ fromJson(inputs.shard_indexes) }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
