@@ -47,7 +47,8 @@ export default defineConfig({
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
   },
-  grep: TEST_SUITE ? new RegExp(`@${TEST_SUITE}`) : undefined,  projects: [
+  grep: TEST_SUITE ? new RegExp(`@${TEST_SUITE}`) : undefined,
+  projects: [
     {
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },

@@ -23,11 +23,16 @@ on:
         description: 'Number of Playwright workers'
         required: false
         default: '2'
+      shards:
+        description: 'Number of test shards for parallel execution'
+        required: false
+        default: '2'
 
 env:
   TEST_ENV: test
   TEST_SUITE: ''
   WORKERS: '2'
+  SHARDS: '2'
 
 jobs:
   lint:
@@ -58,7 +63,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        shard: [1, 2]
+        shard: [1, 2, 3, 4]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -87,6 +92,7 @@ jobs:
           echo TEST_ENV=${{ github.event.inputs.test_env || env.TEST_ENV }}
           echo TEST_SUITE=${{ github.event.inputs.test_suite || env.TEST_SUITE }}
           echo WORKERS=${{ github.event.inputs.workers || env.WORKERS }}
+          echo SHARDS=${{ github.event.inputs.shards || env.SHARDS }}
 
       - name: Run E2E tests (shard ${{ matrix.shard }})
         env:
@@ -94,7 +100,7 @@ jobs:
           TEST_SUITE: ${{ github.event.inputs.test_suite || env.TEST_SUITE }}
           WORKERS: ${{ github.event.inputs.workers || env.WORKERS }}
         run: |
-          npx nx e2e -- --shard=${{ matrix.shard }}/2 --workers=$WORKERS
+          npx nx e2e -- --shard=${{ matrix.shard }}/${{ github.event.inputs.shards || env.SHARDS }} --workers=$WORKERS
 
       - name: Upload Playwright HTML report
         if: always()
