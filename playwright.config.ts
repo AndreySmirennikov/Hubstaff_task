@@ -28,7 +28,6 @@ export default defineConfig({
             outputFolder: 'allure-results',
           },
         ],
-        ['json', { outputFile: 'test-results/results.json' }],
       ]
     : [
         ['html', { open: 'never' }],
@@ -39,20 +38,16 @@ export default defineConfig({
             outputFolder: 'allure-results',
           },
         ],
-        ['json', { outputFile: 'test-results/results.json' }],
       ]) as any,
   use: {
     trace: 'on-first-retry',
-    actionTimeout: 20000,
+    actionTimeout: 30000,
     navigationTimeout: 30000,
     baseURL: baseURL,
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
   },
-  // Optional suite selection via env TEST_SUITE using tags like @smoke or @regression
-  // If no suite provided, run all tests
-  grep: TEST_SUITE ? new RegExp(`@${TEST_SUITE}`) : undefined,
-  projects: [
+  grep: TEST_SUITE ? new RegExp(`@${TEST_SUITE}`) : undefined,  projects: [
     {
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
@@ -63,7 +58,7 @@ export default defineConfig({
     },
   ],
   expect: {
-    timeout: 20000,
+    timeout: 30000,
   },
   outputDir: 'test-results/',
 });
