@@ -138,7 +138,7 @@ jobs:
         with:
           pattern: blob-report-*
           path: blob-shards
-          merge-multiple: false
+          merge-multiple: true
 
       - name: Install Node dependencies
         run: npm ci
