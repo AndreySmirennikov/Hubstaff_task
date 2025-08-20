@@ -12,7 +12,8 @@
     "e2e": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "npm run e2e -- {args}"
+        "command": "npm run e2e --",
+        "forwardAllArgs": true
       }
     }
   }
