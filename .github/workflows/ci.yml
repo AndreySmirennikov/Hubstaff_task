@@ -1,0 +1,185 @@
+name: CI - Lint and Playwright E2E
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: ["**"]
+  schedule:
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+    inputs:
+      test_env:
+        description: 'Environment to run against (test|prod)'
+        required: false
+        default: 'test'
+        type: choice
+        options: [test, prod]
+      test_suite:
+        description: 'Optional suite tag to run (e.g. smoke, regression)'
+        required: false
+        default: ''
+      workers:
+        description: 'Number of Playwright workers'
+        required: false
+        default: '2'
+
+env:
+  TEST_ENV: test
+  TEST_SUITE: ''
+  WORKERS: '2'
+
+jobs:
+  lint:
+    name: ESLint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run ESLint
+        run: npx nx lint
+
+  e2e:
+    name: Playwright E2E (shard ${{ matrix.shard }})
+    needs: lint
+    runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/playwright:v1.54.1
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup npm cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-npm-
+
+      - name: Install system dependencies (Allure requirements)
+        run: |
+          apt-get update -y
+          apt-get install -y --no-install-recommends wget unzip openjdk-17-jre-headless
+
+      - name: Install Node dependencies
+        run: npm ci
+
+      - name: Print runtime info
+        run: |
+          node -v
+          npm -v
+          npx playwright --version
+          echo TEST_ENV=${{ github.event.inputs.test_env || env.TEST_ENV }}
+          echo TEST_SUITE=${{ github.event.inputs.test_suite || env.TEST_SUITE }}
+          echo WORKERS=${{ github.event.inputs.workers || env.WORKERS }}
+
+      - name: Run E2E tests (shard ${{ matrix.shard }})
+        env:
+          TEST_ENV: ${{ github.event.inputs.test_env || env.TEST_ENV }}
+          TEST_SUITE: ${{ github.event.inputs.test_suite || env.TEST_SUITE }}
+          WORKERS: ${{ github.event.inputs.workers || env.WORKERS }}
+        run: |
+          npx nx e2e -- --shard=${{ matrix.shard }}/2 --workers=$WORKERS
+
+      - name: Upload Playwright HTML report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-${{ matrix.shard }}
+          path: playwright-report
+          if-no-files-found: ignore
+          retention-days: 7
+
+      - name: Upload Playwright blob report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: blob-report-${{ matrix.shard }}
+          path: blob-report
+          if-no-files-found: ignore
+          retention-days: 7
+
+      - name: Upload test raw results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-${{ matrix.shard }}
+          path: test-results
+          if-no-files-found: ignore
+          retention-days: 7
+
+      - name: Upload Allure results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-results-${{ matrix.shard }}
+          path: allure-results
+          if-no-files-found: ignore
+          retention-days: 7
+
+  allure-report:
+    name: Generate Allure Report
+    needs: e2e
+    runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/playwright:v1.54.1
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download Allure results (all shards)
+        uses: actions/download-artifact@v4
+        with:
+          pattern: allure-results-*
+          path: allure-shards
+          merge-multiple: false
+
+      - name: Install Allure CLI
+        run: |
+          apt-get update -y
+          apt-get install -y --no-install-recommends wget unzip openjdk-17-jre-headless
+          ALLURE_VERSION=2.29.0
+          wget -q https://github.com/allure-framework/allure2/releases/download/${ALLURE_VERSION}/allure-${ALLURE_VERSION}.zip -O /tmp/allure.zip
+          unzip -q /tmp/allure.zip -d /opt
+          ln -s /opt/allure-*/bin/allure /usr/local/bin/allure
+          allure --version
+
+      - name: Merge Allure results
+        run: |
+          set -e
+          mkdir -p allure-merge
+          for dir in allure-shards/*; do
+            if [ -d "$dir" ]; then
+              echo "Merging $dir"
+              cp -r "$dir"/* allure-merge/ || true
+            fi
+          done
+          echo "Merged count: $(ls -1 allure-merge | wc -l) files"
+
+      - name: Generate Allure report
+        run: |
+          allure generate allure-merge --clean -o allure-report
+
+      - name: Upload Allure HTML report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-report
+          path: allure-report
+          if-no-files-found: ignore
+          retention-days: 14

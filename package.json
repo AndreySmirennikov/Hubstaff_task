@@ -9,6 +9,7 @@
     "test:headed": "npx playwright test --headed",
     "test:debug": "npx playwright test --debug",
     "test:ci": "npx playwright test --reporter=html,allure-playwright",
+    "e2e": "npx playwright test",
     "report": "npx playwright show-report",
     "install-browsers": "npx playwright install",
     "lint": "eslint . --ext .ts,.js",
@@ -28,6 +29,7 @@
   "author": "Andrei S",
   "license": "MIT",
   "devDependencies": {
+    "nx": "^19.8.3",
     "@eslint/js": "^9.0.0",
     "@faker-js/faker": "^9.9.0",
     "@playwright/test": "^1.54.1",

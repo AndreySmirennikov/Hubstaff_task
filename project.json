@@ -1,0 +1,19 @@
+{
+  "$schema": "./node_modules/nx/schemas/project-schema.json",
+  "name": "hubstaff-automation",
+  "sourceRoot": ".",
+  "targets": {
+    "lint": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npm run lint"
+      }
+    },
+    "e2e": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npm run e2e -- {args}"
+      }
+    }
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "$schema": "./node_modules/nx/schemas/nx-schema.json",
+  "defaultBase": "main",
+  "targetDefaults": {
+    "e2e": {
+      "cache": true,
+      "inputs": ["default", "{workspaceRoot}/playwright.config.ts", "{workspaceRoot}/tests/**"],
+      "outputs": [
+        "{workspaceRoot}/playwright-report",
+        "{workspaceRoot}/allure-results",
+        "{workspaceRoot}/test-results",
+        "{workspaceRoot}/blob-report"
+      ]
+    },
+    "lint": {
+      "cache": true,
+      "inputs": ["default"]
+    }
+  }
+}
