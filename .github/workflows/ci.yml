@@ -25,10 +25,9 @@ on:
         default: '2'
 
 env:
-  TEST_ENV: ${{ inputs.test_env }}
-  TEST_SUITE: ${{ inputs.test_suite }}
-  WORKERS: ${{ inputs.workers }}
-  SHARDS: ${{ inputs.shard_indexes }}
+  TEST_ENV: test
+  TEST_SUITE: ''
+  WORKERS: 2
 
 jobs:
   lint:
@@ -46,12 +45,6 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
-
-      - name: Print env
-        run: |
-          echo TEST_ENV=${{ env.TEST_ENV }}
-          echo TEST_SUITE=${{ env.TEST_SUITE }}
-          echo WORKERS=${{  env.WORKERS }}
 
       - name: Run ESLint
         run: npx nx lint
@@ -86,16 +79,6 @@ jobs:
       - name: Install Node dependencies
         run: npm ci
 
-      - name: Print runtime info
-        run: |
-          node -v
-          npm -v
-          npx playwright --version
-          echo TEST_ENV=${{  env.TEST_ENV }}
-          echo TEST_SUITE=${{  env.TEST_SUITE }}
-          echo WORKERS=${{ env.WORKERS }}
-          echo SHARDS=${{  env.SHARDS }}
-
       - name: Run E2E tests (shard ${{ matrix.shard }})
         env:
           TEST_ENV: ${{ github.event.inputs.test_env || env.TEST_ENV }}
@@ -122,15 +105,6 @@ jobs:
           if-no-files-found: ignore
           retention-days: 7
 
-      - name: Upload test raw results
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: test-results-${{ matrix.shard }}
-          path: test-results
-          if-no-files-found: ignore
-          retention-days: 7
-
       - name: Upload Allure results
         if: always()
         uses: actions/upload-artifact@v4
@@ -140,8 +114,8 @@ jobs:
           if-no-files-found: ignore
           retention-days: 7
 
-  allure-report:
-    name: Generate Allure Report
+  reports:
+    name: Generate Reports(Allure, Playwright)
     if: always()
     needs: e2e
     runs-on: ubuntu-latest
@@ -157,6 +131,28 @@ jobs:
           pattern: allure-results-*
           path: allure-shards
           merge-multiple: false
+
+      - name: Download Playwright blob reports (all shards)
+        uses: actions/download-artifact@v4
+        with:
+          pattern: blob-report-*
+          path: blob-shards
+          merge-multiple: false
+
+      - name: Install Node dependencies
+        run: npm ci
+
+      - name: Merge blob reports -> Playwright HTML
+        run: npx playwright merge-reports --reporter html blob-shards
+
+      - name: Upload merged Playwright HTML report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-merged
+          path: playwright-report
+          if-no-files-found: ignore
+          retention-days: 14
 
       - name: Install Allure CLI
         run: |
