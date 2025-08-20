@@ -16,7 +16,7 @@ on:
         type: choice
         options: [test, prod]
       test_suite:
-        description: 'Optional suite tag to run (e.g. smoke, regression)'
+        description: 'Optional suite tag to run (for example: smoke or leave empty for run all tests)'
         required: false
         default: ''
       workers:

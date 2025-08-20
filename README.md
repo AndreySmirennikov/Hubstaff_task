@@ -110,7 +110,7 @@ The CI pipeline lives in `./.github/workflows/ci.yml` and runs on every push and
 
 - **How to run it**:
   - Push to any branch or open a Pull Request — CI triggers automatically.
-  - Manually: on the repository page → Actions → "CI - Lint and Playwright E2E" → Run workflow (optionally pass inputs like workers/test_suit).
+  - Manually: on the repository page → Actions → "CI - Lint and Playwright E2E" → Run workflow (optionally pass inputs like workers/test_suit(for example: smoke)).
 
 - **Where to find results**:
   - Artifacts tab of the workflow run:
