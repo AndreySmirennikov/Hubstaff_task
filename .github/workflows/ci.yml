@@ -2,9 +2,9 @@ name: CI - Lint and Playwright E2E
 
 on:
   push:
-    branches: ["**"]
+    branches: ['**']
   pull_request:
-    branches: ["**"]
+    branches: ['**']
   schedule:
     - cron: '0 2 * * *'
   workflow_dispatch:

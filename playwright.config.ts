@@ -17,32 +17,30 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
   workers: process.env.CI ? (process.env.WORKERS ? Number(process.env.WORKERS) : 2) : 4,
-  reporter: (
-    process.env.CI
-      ? [
-          ['blob', { outputDir: 'blob-report' }],
-          ['html', { open: 'never' }],
-          [
-            'allure-playwright',
-            {
-              detail: true,
-              outputFolder: 'allure-results',
-            },
-          ],
-          ['json', { outputFile: 'test-results/results.json' }],
-        ]
-      : [
-          ['html', { open: 'never' }],
-          [
-            'allure-playwright',
-            {
-              detail: true,
-              outputFolder: 'allure-results',
-            },
-          ],
-          ['json', { outputFile: 'test-results/results.json' }],
-        ]
-  ) as any,
+  reporter: (process.env.CI
+    ? [
+        ['blob', { outputDir: 'blob-report' }],
+        ['html', { open: 'never' }],
+        [
+          'allure-playwright',
+          {
+            detail: true,
+            outputFolder: 'allure-results',
+          },
+        ],
+        ['json', { outputFile: 'test-results/results.json' }],
+      ]
+    : [
+        ['html', { open: 'never' }],
+        [
+          'allure-playwright',
+          {
+            detail: true,
+            outputFolder: 'allure-results',
+          },
+        ],
+        ['json', { outputFile: 'test-results/results.json' }],
+      ]) as any,
   use: {
     trace: 'on-first-retry',
     actionTimeout: 20000,
@@ -53,9 +51,7 @@ export default defineConfig({
   },
   // Optional suite selection via env TEST_SUITE using tags like @smoke or @regression
   // If no suite provided, run all tests
-  grep: TEST_SUITE
-    ? new RegExp(`@${TEST_SUITE}`)
-    : undefined,
+  grep: TEST_SUITE ? new RegExp(`@${TEST_SUITE}`) : undefined,
   projects: [
     {
       name: 'chromium',
