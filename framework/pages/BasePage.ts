@@ -9,7 +9,7 @@ export abstract class BasePage {
     this.page = page;
     this.acceptCookieButton = new Button(
       this.page,
-      'button[id=CybotCookiebotDialogBodyLevelButtonAccept]',
+      'button[id*="ButtonAccept"]',
       'OK Button Accept terms'
     );
   }
