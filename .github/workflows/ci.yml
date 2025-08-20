@@ -51,6 +51,13 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Print env
+        run: |
+          echo TEST_ENV=${{ github.event.inputs.test_env || env.TEST_ENV }}
+          echo TEST_SUITE=${{ github.event.inputs.test_suite || env.TEST_SUITE }}
+          echo WORKERS=${{ github.event.inputs.workers || env.WORKERS }}
+          echo SHARDS=${{ github.event.inputs.shards  }}
+
       - name: Run ESLint
         run: npx nx lint
 
@@ -63,7 +70,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        shard: ${{ fromJson(inputs.shard_indexes) }}
+        shard: ${{ fromJson(github.event.inputs.shards) }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -84,15 +91,15 @@ jobs:
       - name: Install Node dependencies
         run: npm ci
 
-      # - name: Print runtime info
-      #   run: |
-      #     node -v
-      #     npm -v
-      #     npx playwright --version
-      #     echo TEST_ENV=${{ github.event.inputs.test_env || env.TEST_ENV }}
-      #     echo TEST_SUITE=${{ github.event.inputs.test_suite || env.TEST_SUITE }}
-      #     echo WORKERS=${{ github.event.inputs.workers || env.WORKERS }}
-      #     echo SHARDS=${{ github.event.inputs.shards || env.SHARDS }}
+      - name: Print runtime info
+        run: |
+          node -v
+          npm -v
+          npx playwright --version
+          echo TEST_ENV=${{ github.event.inputs.test_env || env.TEST_ENV }}
+          echo TEST_SUITE=${{ github.event.inputs.test_suite || env.TEST_SUITE }}
+          echo WORKERS=${{ github.event.inputs.workers || env.WORKERS }}
+          echo SHARDS=${{ github.event.inputs.shards || env.SHARDS }}
 
       - name: Run E2E tests (shard ${{ matrix.shard }})
         # env:
