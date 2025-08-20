@@ -7,10 +7,17 @@ export abstract class BasePage {
 
   constructor(page: Page) {
     this.page = page;
-    this.acceptCookieButton = Button.fromLocator(
-      this.page.getByRole('button', { name: 'OK' }),
-      'Accept Cookie Button'
+    this.acceptCookieButton = new Button(
+      this.page,
+      'button[id=CybotCookiebotDialogBodyLevelButtonAccept]',
+      'OK Button Accept terms'
     );
+  }
+
+  async acceptCookie() {
+    await test.step('Accept cookie', async () => {
+      await this.acceptCookieButton.click();
+    });
   }
 
   async extractOrgIdAfterSignIn(): Promise<string> {

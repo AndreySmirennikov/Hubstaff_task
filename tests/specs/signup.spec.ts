@@ -14,6 +14,7 @@ test(
     await pages.signupPage.verifyPageLoaded();
     await pages.signupPage.fillSignupForm(userData);
     await pages.signupPage.acceptTerms();
+    await pages.signupPage.acceptCookie();
     await pages.signupPage.clickCreateAccount();
     await pages.emailVerificationPage.verifyPageLoaded();
     try {

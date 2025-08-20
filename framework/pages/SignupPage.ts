@@ -12,7 +12,6 @@ export class SignupPage extends BasePage {
   readonly createAccountButton: Button;
   readonly pageTitle: Text;
   readonly errorDialog: Button;
-  readonly okButton: Button;
 
   constructor(page: Page) {
     super(page);
@@ -32,7 +31,6 @@ export class SignupPage extends BasePage {
       'dialog:has-text("This domain is prevented")',
       'Error Dialog'
     );
-    this.okButton = new Button(this.page, 'button:has-text("OK")', 'OK Button');
   }
 
   async fillSignupForm(userData: UserData) {

@@ -23,16 +23,16 @@ on:
         description: 'Number of Playwright workers'
         required: false
         default: '2'
-      shards:
-        description: 'Number of test shards for parallel execution'
+      shard_indexes:
+        description: 'Array of shard indexes to run. Example: [1,2]'
         required: false
-        default: '2'
+        default: '[1,2]'
 
 env:
-  TEST_ENV: test
-  TEST_SUITE: ''
-  WORKERS: '2'
-  SHARDS: '2'
+  TEST_ENV: ${{ inputs.test_env }}
+  TEST_SUITE: ${{ inputs.test_suite }}
+  WORKERS: ${{ inputs.workers }}
+  SHARDS: ${{ inputs.shard_indexes }}
 
 jobs:
   lint:
@@ -63,7 +63,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        shard: [1, 2, 3, 4]
+        shard: ${{ fromJson(github.event.inputs.shard_indexes || vars.SHARD_INDEXES ) }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -84,21 +84,21 @@ jobs:
       - name: Install Node dependencies
         run: npm ci
 
-      - name: Print runtime info
-        run: |
-          node -v
-          npm -v
-          npx playwright --version
-          echo TEST_ENV=${{ github.event.inputs.test_env || env.TEST_ENV }}
-          echo TEST_SUITE=${{ github.event.inputs.test_suite || env.TEST_SUITE }}
-          echo WORKERS=${{ github.event.inputs.workers || env.WORKERS }}
-          echo SHARDS=${{ github.event.inputs.shards || env.SHARDS }}
+      # - name: Print runtime info
+      #   run: |
+      #     node -v
+      #     npm -v
+      #     npx playwright --version
+      #     echo TEST_ENV=${{ github.event.inputs.test_env || env.TEST_ENV }}
+      #     echo TEST_SUITE=${{ github.event.inputs.test_suite || env.TEST_SUITE }}
+      #     echo WORKERS=${{ github.event.inputs.workers || env.WORKERS }}
+      #     echo SHARDS=${{ github.event.inputs.shards || env.SHARDS }}
 
       - name: Run E2E tests (shard ${{ matrix.shard }})
-        env:
-          TEST_ENV: ${{ github.event.inputs.test_env || env.TEST_ENV }}
-          TEST_SUITE: ${{ github.event.inputs.test_suite || env.TEST_SUITE }}
-          WORKERS: ${{ github.event.inputs.workers || env.WORKERS }}
+        # env:
+        #   TEST_ENV: ${{ github.event.inputs.test_env || env.TEST_ENV }}
+        #   TEST_SUITE: ${{ github.event.inputs.test_suite || env.TEST_SUITE }}
+        #   WORKERS: ${{ github.event.inputs.workers || env.WORKERS }}
         run: |
           npx nx e2e -- --shard=${{ matrix.shard }}/${{ github.event.inputs.shards || env.SHARDS }} --workers=$WORKERS
 
