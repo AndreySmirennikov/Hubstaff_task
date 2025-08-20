@@ -1,0 +1,77 @@
+# Environment-specific configuration for Playwright CI/CD
+# This file defines environment variables and settings for different deployment targets
+
+name: 🌍 Environment Configuration
+
+# This workflow sets up environment-specific variables
+# It's included as a reusable workflow in the main pipeline
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+        description: "Target environment (dev/staging/production)"
+    outputs:
+      base_url:
+        description: "Base URL for the target environment"
+        value: ${{ jobs.setup-env.outputs.base_url }}
+      test_timeout:
+        description: "Test timeout for the environment"
+        value: ${{ jobs.setup-env.outputs.test_timeout }}
+      workers_count:
+        description: "Recommended workers count for environment"
+        value: ${{ jobs.setup-env.outputs.workers_count }}
+
+jobs:
+  setup-env:
+    name: 🔧 Setup Environment Configuration
+    runs-on: ubuntu-latest
+    outputs:
+      base_url: ${{ steps.config.outputs.base_url }}
+      test_timeout: ${{ steps.config.outputs.test_timeout }}
+      workers_count: ${{ steps.config.outputs.workers_count }}
+      
+    steps:
+      - name: 📋 Set environment configuration
+        id: config
+        run: |
+          case "${{ inputs.environment }}" in
+            "production")
+              echo "base_url=https://app.hubstaff.com" >> $GITHUB_OUTPUT
+              echo "test_timeout=300000" >> $GITHUB_OUTPUT
+              echo "workers_count=2" >> $GITHUB_OUTPUT
+              echo "🚀 Production environment configured"
+              ;;
+            "staging")
+              echo "base_url=https://staging.hubstaff.com" >> $GITHUB_OUTPUT
+              echo "test_timeout=200000" >> $GITHUB_OUTPUT
+              echo "workers_count=4" >> $GITHUB_OUTPUT
+              echo "🔄 Staging environment configured"
+              ;;
+            "dev")
+              echo "base_url=https://dev.hubstaff.com" >> $GITHUB_OUTPUT
+              echo "test_timeout=150000" >> $GITHUB_OUTPUT
+              echo "workers_count=6" >> $GITHUB_OUTPUT
+              echo "🛠️ Development environment configured"
+              ;;
+            *)
+              echo "❌ Unknown environment: ${{ inputs.environment }}"
+              echo "base_url=https://staging.hubstaff.com" >> $GITHUB_OUTPUT
+              echo "test_timeout=200000" >> $GITHUB_OUTPUT
+              echo "workers_count=4" >> $GITHUB_OUTPUT
+              echo "⚠️ Defaulting to staging configuration"
+              ;;
+          esac
+          
+      - name: 📊 Environment Summary
+        run: |
+          echo "## 🌍 Environment Configuration" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Setting | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|---------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Environment | ${{ inputs.environment }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Base URL | ${{ steps.config.outputs.base_url }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Timeout | ${{ steps.config.outputs.test_timeout }}ms |" >> $GITHUB_STEP_SUMMARY
+          echo "| Workers | ${{ steps.config.outputs.workers_count }} |" >> $GITHUB_STEP_SUMMARY
