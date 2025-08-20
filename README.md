@@ -55,16 +55,6 @@ After the tests have been executed, you can view a detailed report:
 npm run report
 ```
 
-## 🧪 Test Cases
-
-This framework automates the following test cases:
-
--   **Sign up**: Covers the registration process for a new user.
--   **Sign in**: Automates the user login process.
-    -   **Note**: This test is intentionally designed to fail. According to the test case, a successful sign-in should redirect the user to the Dashboard page. However, in the current application version, it redirects to the Insights page. The automated test follows the test case specification, causing a deliberate failure to highlight this discrepancy.
--   **Add/Create Project**: Automates the creation of a new project within the application.
--   **Bonus payment**: Covers the scenario related to bonus payments. (Further details to be specified).
-
 ## 🏗️ Framework Architecture
 
 The project follows a standard Page Object Model (POM) design pattern for maintainable and scalable test automation.
@@ -73,25 +63,64 @@ The project follows a standard Page Object Model (POM) design pattern for mainta
 
 ```
 Hubstaff_task/
+├── .github/
+│   └── workflows/
+│       └── ci.yml            # CI pipeline (lint → e2e shards → reports)
 ├── tests/
-│   ├── specs/           # Contains the test specifications (test files)
+│   └── specs/                # Test specifications
 ├── framework/
-│   ├── pages/           # Page Object Model classes
-│   ├── utils/           # Utility functions and helpers
-│   ├── wrapper/         # Wrappers for Playwright elements
-│   └── fixtures/        # Test data and fixtures
-├── package.json         # Project dependencies and scripts
-└── playwright.config.ts # Playwright configuration
+│   ├── pages/                # Page Object Model classes
+│   ├── utils/                # Utilities and helpers
+│   ├── wrapper/              # Element wrappers
+│   └── fixtures/             # Test fixtures
+├── package.json              # Scripts and deps
+└── playwright.config.ts      # Playwright config (reporters, timeouts, etc.)
 ```
 
 ### Key Components
 
--   **`tests/specs/`**: This directory contains all the test scripts. Each file corresponds to a specific feature or module of the application.
--   **`tests/fixtures/`**: This directory contains base test configurations and fixtures that can be used across different tests.
--   **`framework/pages/`**: Each file in this directory represents a page in the application and contains the locators and methods specific to that page. This follows the Page Object Model (POM) design pattern.
--   **`framework/utils/`**: Contains helper functions, such as data generators or API clients, that can be used in the tests.
--   **`framework/wrapper/`**: This directory contains custom wrapper classes for Playwright's built-in elements (like `Button`, `Input`, etc.) to add custom logic or logging.
--   **`playwright.config.ts`**: The main configuration file for Playwright, where you can configure browsers, reporters, and other test settings.
+-   **`tests/specs/`**: All test scripts.
+-   **`framework/pages/`**: Page Object Model (POM) classes.
+-   **`framework/utils/`**: Helpers (e.g., mail, data generation).
+-   **`framework/wrapper/`**: Wrapper classes over Playwright locators.
+-   **`playwright.config.ts`**: Global configuration, reporters (HTML, Allure), traces/videos on failure.
+
+## 🧪 Test Cases
+
+This framework automates the following test cases:
+
+-   **Sign up**: Covers the registration process for a new user.
+-   **Sign in**: Automates the user login process.
+    -   **Note**: The test is intentionally designed to fail to demonstrate an expected-vs-actual discrepancy.
+-   **Add/Create Project**: Automates creation of a new project.
+-   **Bonus payment**: One‑time bonus flow.
+
+## 🧰 CI/CD (GitHub Actions)
+
+The CI pipeline lives in `./.github/workflows/ci.yml` and runs on every push and PR, plus a nightly schedule.
+
+- **Jobs order**:
+  1. **lint**: ESLint check (Node 20).
+  2. **e2e**: Playwright tests run inside container `mcr.microsoft.com/playwright:v1.54.1` in parallel shards.
+     - Shards are defined via matrix (e.g., `[1,2]`).
+     - Denominator uses `${{ strategy.job-total }}` so each shard runs as `--shard=<index>/${{ strategy.job-total }}`.
+     - Each shard uploads two artifacts: `blob-report-<shard>` and `allure-results-<shard>`.
+  3. **reports**: Aggregates artifacts from all shards and produces final reports:
+     - Merges Playwright blob reports: `npx playwright merge-reports --reporter html blob-shards` → uploads `playwright-report-merged`.
+     - Installs Allure CLI, merges `allure-results-*` into one folder and generates `allure-report`.
+
+- **How to run it**:
+  - Push to any branch or open a Pull Request — CI triggers automatically.
+  - Manually: on the repository page → Actions → "CI - Lint and Playwright E2E" → Run workflow (optionally pass inputs like workers/test_suit).
+
+- **Where to find results**:
+  - Artifacts tab of the workflow run:
+    - `playwright-report-merged` — final Playwright HTML report.
+    - `allure-report` — final Allure HTML report.
+
+Tips:
+- To change sharding quickly, edit the matrix in `ci.yml` under `strategy.matrix.shard: [1,2]`.
+- Traces/videos for failures are kept by Playwright config and visible from the reports.
 
 ## 📧 Email Verification
 
@@ -108,5 +137,5 @@ All emails sent to the plus-addresses will be delivered to the base email's inbo
 
 ## 📊 Reporting
 
-The framework is integrated with Allure for generating detailed test reports. When tests are run, Allure collects data and generates an HTML report with detailed information about each test, including steps, assertions, and attachments like screenshots for failed tests.
+The framework is integrated with Allure and Playwright HTML reports. In CI, shard artifacts are merged into a single Allure HTML report (`allure-report`) and a single Playwright HTML report (`playwright-report-merged`). Open artifacts from the workflow run to view them locally.
 
