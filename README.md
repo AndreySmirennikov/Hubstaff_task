@@ -91,7 +91,6 @@ This framework automates the following test cases:
 
 -   **Sign up**: Covers the registration process for a new user.
 -   **Sign in**: Automates the user login process.
-    -   **Note**: The test is intentionally designed to fail to demonstrate an expected-vs-actual discrepancy.
 -   **Add/Create Project**: Automates creation of a new project.
 -   **Bonus payment**: One‑time bonus flow.
 

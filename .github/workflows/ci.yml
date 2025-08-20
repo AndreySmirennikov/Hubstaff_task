@@ -84,7 +84,6 @@ jobs:
           TEST_ENV: ${{ github.event.inputs.test_env || env.TEST_ENV }}
           TEST_SUITE: ${{ github.event.inputs.test_suite || env.TEST_SUITE }}
           WORKERS: ${{ github.event.inputs.workers || env.WORKERS }}
-          CI: true
         run: |
           npx nx e2e -- --shard=${{ matrix.shard }}/${{ strategy.job-total }}
 
