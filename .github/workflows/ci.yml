@@ -134,6 +134,7 @@ jobs:
 
   allure-report:
     name: Generate Allure Report
+    if: always()
     needs: e2e
     runs-on: ubuntu-latest
     container:
@@ -163,16 +164,24 @@ jobs:
         run: |
           set -e
           mkdir -p allure-merge
-          for dir in allure-shards/*; do
-            if [ -d "$dir" ]; then
-              echo "Merging $dir"
-              cp -r "$dir"/* allure-merge/ || true
-            fi
-          done
-          echo "Merged count: $(ls -1 allure-merge | wc -l) files"
+          if [ -d "allure-shards" ]; then
+            for dir in allure-shards/*; do
+              if [ -d "$dir" ]; then
+                echo "Merging $dir"
+                cp -r "$dir"/* allure-merge/ || true
+              fi
+            done
+          fi
+          echo "Merged count: $(ls -1 allure-merge 2>/dev/null | wc -l) files"
 
       - name: Generate Allure report
         run: |
+          if [ ! -d allure-merge ] || [ -z "$(ls -A allure-merge 2>/dev/null)" ]; then
+            echo "No Allure results found; creating placeholder report"
+            mkdir -p allure-report
+            echo '<html><body><h2>No Allure results available</h2></body></html>' > allure-report/index.html
+            exit 0
+          fi
           allure generate allure-merge --clean -o allure-report
 
       - name: Upload Allure HTML report
